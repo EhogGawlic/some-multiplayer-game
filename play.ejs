@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Game</title>
+    </head>
+    <body>
+        Hi
+        <!-- Socket.IO client library -->
+         <img src="/bgr.png">
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            //let player = {health:100,player:"bob",pos:{x:0,y:0}}
+            const socket = io();
+            // Listen for serverMessage event
+            socket.on('serverMessage', function(data) {
+                
+            });
+        </script>
+    </body>
+</html>
