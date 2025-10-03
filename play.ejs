@@ -8,15 +8,58 @@
     <body>
         Hi
         <!-- Socket.IO client library -->
-         <img src="/bgr.png">
+         <img src="https://raw.githubusercontent.com/EhogGawlic/some-multiplayer-game/refs/heads/main/public/bgr.png" style="position: absolute;left: 0;top: 0;height: 100%;">
+         <div id="oplayer" style="position: absolute;top: 0;bottom: 0;width: 128px;height: 256px;background-color: lightgray;"></div>
+         <div id="tplayer" style="position: absolute;top: 0;bottom: 0;width: 128px;height: 256px;background-color: lightgray;"></div>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            //let player = {health:100,player:"bob",pos:{x:0,y:0}}
+            let player = {health:100,player:"bob",pos:{x:0,y:0}}
+            const pdiv = document.getElementById("tplayer");
+            const odiv = document.getElementById("oplayer");
             const socket = io();
             // Listen for serverMessage event
             socket.on('serverMessage', function(data) {
-                
+                pdiv.innerText="hi "+player.player+"\n"+player.health+" HP (you)";
+                if (data.type=="hit"){
+                    if (data.player.pos.x < player.pos.x + 128 &&
+                        data.player.pos.x + 128 > player.pos.x &&
+                        data.player.pos.y < player.pos.y + 256 &&
+                        data.player.pos.y + 256 > player.pos.y) {
+                            // Collision detected!
+                            player.health-=10;
+                            if (player.health<0){player.health=0;
+                                alert("you died");
+                                player.health=100;
+                                player.pos={x:0,y:0};
+                            }
+                            socket.emit('clientMessage', {type:"upd",player:player});
+                    }
+                }
+                if (data.type=='upd'){
+
+odiv.style.top=data.player.pos.y+"px";
+odiv.style.left=data.player.pos.x+"px";
+                odiv.innerText="hi "+data.player.player+"\n"+data.player.health+" HP";
+                }
+
             });
+            function loop(){
+                //pdiv.innerText="hi "+player.player+"\n"+player.health+" HP";
+                socket.emit('clientMessage', {type:"upd",player:player});
+                requestAnimationFrame(loop);
+            }
+            loop();
+            window.onkeydown=function(e){
+                if (e.key=="w")player.pos.y-=5;
+                if (e.key=="s")player.pos.y+=5;
+                if (e.key=="a")player.pos.x-=5;
+                if (e.key=="d")player.pos.x+=5;
+pdiv.style.top=player.pos.y+"px";
+pdiv.style.left=player.pos.x+"px";
+if (e.key==" "){
+    socket.emit('clientMessage', {type:"hit",player:player});
+}
+            }
         </script>
     </body>
 </html>

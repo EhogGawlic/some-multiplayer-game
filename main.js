@@ -114,8 +114,18 @@ io.on('connection', (socket) => {
     // Emit a test event to the client
 
     socket.emit('serverMessage', { message: 'Welcome to the game!' });
+socket.on('clientMessage', (data) => {
+    if (data.type=='upd'){
+        socket.broadcast.emit('serverMessage', data);
+    }
+    if (data.type=='hit'){
+        socket.broadcast.emit('serverMessage', {type:'hit',player:data.player});
+    }
+})
 });
-
+io.on('clientMessage', (data) => {
+    console.log('Message from client:', data);
+})
 server.listen(port, () => {
     console.log(`App listening on port ${port}`);
 })
